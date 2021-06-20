@@ -40,7 +40,7 @@ See the [tests](https://github.com/bluretrece/nocion/blob/main/tests/notion_test
 - [ ] Prettyprint JSON in tables.
 
 ## Future design decisions
-To make the code more ergonomic, it would be more practical to create pages with some like:
+To make the code more ergonomic, it would be practical to create pages with something like:
 ```rust
 Page::parent(page_id).with_properties("").children_paragraph("Something something something...");
 ```
