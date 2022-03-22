@@ -1,11 +1,13 @@
 pub use dotenv::dotenv;
 use reqwest::{Client, Error, Response};
+pub use serde::{Deserialize, Serialize};
 pub use serde_json;
-pub mod utils;
 pub mod base;
-use utils::*;
+pub mod body;
+pub mod utils;
 use base::{API_DATABASE_URL, API_PAGE_URL};
 use std::collections::HashMap;
+use utils::*;
 
 // Decide whether to support (for now) pages or databases.
 //
@@ -29,14 +31,13 @@ use std::collections::HashMap;
 // Let's send an HTTP request to the create a page endpoint
 // to add a new item.
 
-
 #[derive(Debug)]
 pub struct Notion {
     pub secret: String,
     pub bearer: String,
 }
 
-/// Should be something like: 
+/// Should be something like:
 /// Page::parent(page_id).with_properties("").children_paragraph("Something something something...");
 ///
 /// API idea:
@@ -56,7 +57,6 @@ pub struct Notion {
 //     children: Vec<Block>
 // }
 
-
 impl Notion {
     pub fn new(secret: String) -> Self {
         Self {
@@ -66,10 +66,7 @@ impl Notion {
     }
 
     /// Retrieves a database from our Workspace.
-    pub async fn get_database(
-        &self,
-        database_id: &'static str,
-    ) -> Result<Response, Error> {
+    pub async fn get_database(&self, database_id: &'static str) -> Result<Response, Error> {
         let client = Client::new();
         let build_url = "https://api.notion.com/v1/databases/".to_owned() + &database_id.to_owned();
 
@@ -83,10 +80,7 @@ impl Notion {
     }
 
     /// Retrieves all active databases from our Workspace.
-    pub async fn get_databases(
-        &self,
-    ) -> Result<Response, Error> {
-
+    pub async fn get_databases(&self) -> Result<Response, Error> {
         let client = Client::new();
         let res = client
             .get(API_DATABASE_URL)
@@ -97,10 +91,7 @@ impl Notion {
         Ok(res)
     }
 
-    pub async fn get_page(&self,
-        page_id: &'static str
-        ) -> Result<Response, Error> {
-
+    pub async fn get_page(&self, page_id: &'static str) -> Result<Response, Error> {
         let build_url = "https://api.notion.com/v1/pages/".to_owned() + &page_id.to_owned();
         let client = Client::new();
         let result = client
@@ -111,15 +102,12 @@ impl Notion {
 
         Ok(result)
     }
-    
+
     // FIXME: body can not be hardcoded.
     //
-    // TODO: Pages can be created with child blocks using the create a page endpoint. 
+    // TODO: Pages can be created with child blocks using the create a page endpoint.
     // This endpoint supports creating a page within another page, or creating a page within a database.
-    pub async fn post_page(
-        &self,
-        body: &'static str,
-    ) -> Result<Response, Error> {
+    pub async fn post_page(&self, body: &'static str) -> Result<Response, Error> {
         let client = Client::new();
         let client_response = client
             .post(API_PAGE_URL)
@@ -131,7 +119,6 @@ impl Notion {
         Ok(client_response)
     }
 }
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

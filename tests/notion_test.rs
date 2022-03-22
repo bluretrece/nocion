@@ -1,4 +1,5 @@
 use notion_rs::*;
+use serde_json;
 use utils::get_secret;
 
 #[tokio::test]
@@ -19,7 +20,10 @@ async fn post_page_works() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     let secret = get_secret();
     let notion_cli = Notion::new(secret);
+    let database_id = "b456e36be1e64e419f3b75ec9639ecfc".to_string();
+    let body = Body::new(database_id);
 
+    // Thes ought to be serializable body struct
     let body = r#"{
     "parent": { "database_id": "b456e36be1e64e419f3b75ec9639ecfc" },
     "properties": {
@@ -27,7 +31,7 @@ async fn post_page_works() -> Result<(), Box<dyn std::error::Error>> {
         "title": [
           {
             "text": {
-              "content": "Yurts in Big Sur, California"
+              "content": "Testing post request"
             }
           }
         ]
@@ -35,10 +39,11 @@ async fn post_page_works() -> Result<(), Box<dyn std::error::Error>> {
     }
   }"#;
 
+    // Receives a JSON body
     let res = notion_cli.post_page(body).await?;
     let status = res.status();
+    println!("{}", res.text().await?);
 
-    // let database_id = "b456e36be1e64e419f3b75ec9639ecfc".to_string();
     assert_eq!(status.as_str(), "200");
 
     Ok(())
